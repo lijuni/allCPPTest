@@ -1,0 +1,10 @@
+# depslib dependency file v1.0
+1507708192 source:/home/lee/cpptest/test10116Client/main.cpp
+	<iostream>
+	<cstdio>
+	<cstdlib>
+	<cstring>
+	<sys/socket.h>
+	<sys/un.h>
+	<unistd.h>
+

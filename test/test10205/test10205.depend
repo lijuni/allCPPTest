@@ -1,0 +1,6 @@
+# depslib dependency file v1.0
+1508482629 source:/home/lee/cpptest/test10205/main.cpp
+	<iostream>
+	<pthread.h>
+	<cstdlib>
+

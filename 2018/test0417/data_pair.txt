@@ -1,0 +1,4 @@
+string1   10
+string3   30
+string1   10
+string6   60

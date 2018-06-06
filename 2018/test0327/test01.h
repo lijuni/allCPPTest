@@ -1,0 +1,63 @@
+//P233 类
+#include<iostream>
+#include<string>
+#include<vector>
+
+using namespace std;
+
+	struct Sales_data{
+	
+		std::string isbn()	const {return this->bookNo;}
+		Sales_data& combine(const Sales_data&);
+		double avg_price() const;
+
+		std::string bookNo;	//书号
+		unsigned units_sold=0; //销量
+		double revenue=0.0;	//销售额
+	};
+
+	Sales_data add(const Sales_data&, const Sales_data&);
+	std::ostream &print(std::ostream&, const Sales_data&);
+	std::istream &read(std::istream&, Sales_data&);
+
+	inline double Sales_data::avg_price() const
+	{
+		if(units_sold)
+			return revenue/units_sold;
+		else
+			return 0;
+	}
+
+	Sales_data& Sales_data::combine(const Sales_data &sd1)
+	{
+		units_sold+=sd1.units_sold;
+		this->revenue+=sd1.revenue;
+		return *this;
+	}
+
+	
+	istream &read(istream &is, Sales_data &sd)
+	{
+		double price=0;
+		is>>sd.bookNo>>sd.units_sold>>price;
+		sd.revenue=sd.units_sold*price;
+		return is;
+	}
+
+	std::ostream &print(std::ostream &os, const Sales_data &sd)
+	{
+		os<<sd.isbn()<<endl<<sd.units_sold<<endl<<sd.revenue<<endl<<sd.avg_price()<<endl;
+		return os;
+	}
+
+	Sales_data add(const Sales_data &sd1, const Sales_data &sd2)
+	{
+		Sales_data sd3=sd1;
+		sd3.combine(sd2);
+		return sd3;
+	}
+	
+
+
+
+

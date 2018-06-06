@@ -1,0 +1,7 @@
+# depslib dependency file v1.0
+1507559173 source:/home/lee/cpptest/test1009-5/main.cpp
+	<iostream>
+	<sys/types.h>
+	<unistd.h>
+	<cstdlib>
+

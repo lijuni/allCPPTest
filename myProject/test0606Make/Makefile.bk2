@@ -1,0 +1,14 @@
+NeedFile = qiandao.o main_with_socket.o
+
+Myserver: $(NeedFile)
+	g++ -std=c++11 -o Myserver qiandao.o main_with_socket.o
+
+qiandao.o: qiandao.h
+	$(CXX) -std=c++11 -c qiandao.cpp
+
+main_with_socket.o: main_with_socket.cpp
+	g++ -std=c++11 -c main_with_socket.cpp
+
+.PHONY:clean
+clean:
+	-rm -f *.o

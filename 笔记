@@ -1,0 +1,296 @@
+常量 ： const ： 用来预设某些值，程序执行期间不可改变，定义时必须初始化
+const int zero = 0 ;
+
+宏定义 ： #define ： 预处理命令
+#define PI 3.14   //3.14看作是一个文本
+宏定义一旦定义，可以代替常量使用，但宏定义不是常量。宏定义在程序中是直接替换使用的。
+
+注： x*=a+b  等价于  x=x*(a+b)
+
+枚举 ： enum 枚举名 {元素1, 元素2, 元素3,,,,,,元素n};
+enum MONTH{JAN, FEB, MAR, APR, MAY,,,}
+枚举类型声明中的元素为枚举文字，不是变量，映射为0,1,2,3,，
+以上只是枚举类型，有了枚举类型，我们就可以定义枚举变量
+eg ： MONTH month;
+
+用户自定义类型 ： typedef 原类型标识 新类型名;
+eg: typedef int DWORD;  此后两者可以相互取代
+
+C++中的bool类型 ：true，false
+C/C++中以0表示假，非0表示真（一般是1）
+但在C++中尽量使用true，false
+
+闰年 ：if(year%4==0&&year%100!=0||year%400==0)
+
+Switch（） case 语句中，每个 case 语句后务必记得加上 break
+末尾使用default
+
+全局变量：写在using namespace std;后面，函数声明，main函数前面，这样就能全局共享（包括子函数）
+例如int a，b; 然后就能使用Swap函数真正交换他们的值，此时Swap函数不用传参数，里面直接改a，b
+
+随机数：#include<stdlib> rand()   ,其中，RAND_MAX 为最大值，因为种子是一样的，所以运行多次得到的随机数也是一样的，解决方法： #include<ctime> ，以当前时间 (int)time(0) 作为随机数的种子即可，即
+srand((int)time(0)) , 需要注意的是，一个程序中调用一次，因为程序执行的时间非常短，调用多次得到的随机数也是一模一样的
+
+标准库的头文件使用尖括号 < > 包含， 自己写的库的头文件使用双引号 " " 包含
+#include<iostream>	#include"leerandom"
+
+全局解析操作符  ：： ，例如有全局变量 i  ，如果程序中单独写 { int i =10; } 则这个i会在花括号内暂时覆盖全局变量 i ，此时若想使用全局变量 i ， 需要使用  ：：i  即可。
+
+static : 修饰局部变量，使其成为静态局部变量。即程序退出该块时局部变量仍然存在，并且下次进入该块时使用上一次的数值。静态局部变量必须进行初始化，静态只改变生存期，不改变作用域。
+
+static ： 修饰全局变量时表示限定全局变量的作用域在本文件内部，而其他文件不可见。
+
+内部函数与外部函数：内部函数不可以被其他文件中的函数所调用。使用 static 修饰即成为内部函数，缺省时默认为外部函数。
+
+全局变量，在库的源文件里定义 int a ; 库的头文件里声明 extern int a ;
+
+ps aux
+kill -1 num
+
+
+
+
+#include<iostream>
+#include<cstdio>
+#include<cstdlib>
+#include<cstring>
+#include<sys/socket.h>
+#include<sys/un.h>
+#include<unistd.h>
+
+bool Serve(int client_socket)
+{
+    while(true)
+    {
+        int length;
+        char * msg;
+        if(read(client_socket,&length,sizeof(length))==0)
+            return true;
+        msg=new char[length];
+        read(client_socket,msg,length);
+        std::cout<<msg<<std::endl;
+        if(!strcmp(msg,"quit")){delete[] msg,msg=NULL;return false;}
+        else delete[] msg, msg=NULL;
+    }
+}
+
+int main(int argc,char * const argv[])
+{
+    const char * const socket_name=argv[1];
+    int socket_fd;
+    struct sockaddr_un name;
+    bool serving=true;
+
+    socket_fd=socket(PF_LOCAL,SOCK_STREAM,0);
+    name.sun_family=AF_LOCAL;
+    strcpy(name.sun_path,socket_name);
+    bind(socket_fd,(struct sockaddr*)&name,SUN_LEN(&name));
+
+    listen(socket_fd,5);
+    while(serving)
+    {
+        struct sockaddr_un client_name;
+        socklen_t client_name_len;
+        int client_socket_fd;
+        client_socket_fd=accept(socket_fd,(struct sockaddr*)&client_name,&client_name_len);
+        serving=Serve(client_socket_fd);
+        close(client_socket_fd);
+    }
+    close(socket_fd);
+    unlink(socket_name);
+    return 0;./client www.baidu.com
+
+}
+
+
+
+
+
+#include<iostream>
+#include<cstdio>
+#include<cstdlib>
+#include<cstring>
+#include<sys/socket.h>
+#include<sys/un.h>
+#include<unistd.h>
+
+void SendMsg(int socket_fd,const char * msg)
+{
+    int length=strlen(msg)+1;
+    write(socket_fd,&length,sizeof(length));
+    write(socket_fd,msg,length);
+}
+
+int main(int argc,char * const argv[])
+{
+    const char * const socket_name=argv[1];
+    const char * const msg=argv[2];
+    int socket_fd;
+    struct sockaddr_un name;
+
+    socket_fd=socket(PF_LOCAL,SOCK_STREAM,0);
+
+    name.sun_family=AF_LOCAL;
+    strcpy(name.sun_path,socket_name);
+
+    connect(socket_fd,(struct sockaddr *)&name,SUN_LEN(&name));
+
+    SendMsg(socket_fd,msg);
+    close(socket_fd);
+    return 0;
+}
+
+typedef 不是简单的文本替换
+
+int *p,*q;
+==   typedef int * PINT ; PINT p, q;
+而不是 int *p,q;
+
+
+
+int main()
+{
+	#ifndef NDBUG
+		cout<<"这是测试用的"<<endl;
+	#endif
+}
+
+#ifndef //条件编译指令，宏测试，如果没有定义 NDBUG ，则执行后面的代码
+想要上面代码不运行，只需要在整个程序代码前面（main函数之前）写上 #define NDEBUG 定义这个宏即可
+
+
+
+指向常量的指针：
+int n=10;
+const int *P=&n;
+不是表示P是常量，而是表示*P是常量，不能通过*P来改变n的值
+
+eg:  void PrintObject(const int *P);
+表示在函数内部可以使用 *P 的值，但是不能改变 *P 的值
+即限定指针 P 只能作为函数输入集的一部分，而不能作为输出集的一部分
+
+指针常量：不可以改变指针的指向（即不可以将指针指向其他地方），但可以改变指针指向的目标数据对象的值，在定义时必须初始化
+eg:  int n=10; int * const P = &n; *P=20;
+
+常量指针常量：const int * const p = &n;
+
+数组元素地址：
+int a[8] = {0};
+p 指向 a[0] ,那么 p+2 指向 a[2]
+
+空指针 NULL ，不指向任何地方 ， 实际为内存开头
+
+if(p!=NULL) 等价于 if(p)
+
+#define MAX 127
+
+
+数据封装，隐藏数据结构细节
+比如定义一个类class A，里面有元素a，为什么可以直接获取A.a,还要写geta();这个函数呢，就是为了把数据封装起来，无论函数里对a做任何改变，外部都不需要关心，只需要知道 geta() 这个函数如何使用即可
+
+struct不限制外部使用里面的成员，class可以限制
+
+信息隐藏：把struct 结构体的定义从头文件挪到源文件，使用者只能看到头文件，所以不知晓struct内部细节，头文件里进行申明和提供结构体指针：
+×××.h
+struct DD; typedef struct DD *pdd;
+
+
+
+
+
+信号处理相关：
+#include<signal.h>
+#include<string.h>
+#include<sys/types.h>
+#include<unistd.h>
+#include<iostream>
+using namespace std;
+
+sig_atomic_t sigusr1_count=8;
+
+extern "C"
+{
+    void OnSigUsr1(int signal_number)
+    {
+        cout<<"在这里处理信号"<<endl;
+        ++sigusr1_count;
+    }
+}
+
+int main()
+{
+    cout<<"Pid : "<<(int)getpid()<<std::endl;
+
+    struct sigaction sa;
+    memset(&sa,0,sizeof(sa));
+
+    sa.sa_handler=&OnSigUsr1;
+
+    sigaction(SIGUSR1,&sa,NULL);
+    sleep(100);
+
+    std::cout<<"SIGUSR1 counts : "<<sigusr1_count<<endl;
+    return 0;
+
+}
+
+
+
+
+复制当前进程函数 fork()
+该函数返回两个值，非零值表示在父进程内，该值为子进程id
+返回 0 则表示在子进程内.
+
+pid_t ppid=fork();
+
+    if(ppid!=0)
+        cout<<"father progress , and id = "<<(int)getpid()<<" son id ="<<ppid<<endl;
+
+    if(ppid==0)
+        cout<<"son progress , and id = "<<(int)getpid()<<endl;
+
+
+
+当编译含有线程的程序通不过时（对 pthread_create 未定义的引用）
+是因为 pthread 库不是 Linux 系统默认的库，连接时需要使用libpthread.a
+编译命令如下： g++ main.cpp -lpthread 
+
+信号传输：
+#include<iostream>
+#include<cstdlib>
+#include<unistd.h>
+#include<sys/types.h>
+#include<signal.h>
+#include<string.h>
+using namespace std;
+
+extern "C"
+{
+    void SigProcess(int a)
+    {
+        cout<<"进入信号处理程序"<<endl;
+    }
+}
+
+int main(int argc,char * argv[])
+{
+    cout<<"Pid = "<<getpid()<<endl;
+    struct sigaction sa;		//1
+    memset(&sa,0,sizeof(sa));
+    sa.sa_handler=&SigProcess;
+    sigaction(SIGUSR1,&sa,NULL);	//2
+    sleep(100);
+}
+
+其中，第一条语句的 sigaction 是定义一个结构体
+第二条表示一个函数
+
+程序运行后，新开一个窗口，输入命令
+kill -s SIGUSR1(或者是10) 21882(注，这个数表示之前进程的pid)
+输入命令 kill -l 查询所有信号量及其对应表示数字
+
+
+
+
+
+
